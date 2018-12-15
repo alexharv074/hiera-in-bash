@@ -1,0 +1,66 @@
+{
+  "variables": {
+    "vpc": "",
+    "subnet": "",
+    "aws_region": "",
+    "owner": "",
+    "date": "",
+    "instance_type": ""
+  },
+  "builders": [{
+    "name": "Example AMI",
+    "type": "amazon-ebs",
+    "region": "{{user `aws_region`}}",
+    "source_ami_filter": {
+        "filters": {
+            "virtualization-type": "hvm",
+            "name": "amzn-ami*-ebs",
+            "root-device-type": "ebs"
+        },
+        "owners": ["{{user `owner`}}"],
+        "most_recent": true
+    },
+    "instance_type": "{{user `instance_type`}}",
+    "ssh_username": "ec2-user",
+    "ami_name": "ami-{{user `date`}}",
+    "tags": {
+      "Name": "{{user `ami_name`}}"
+    },
+    "run_tags": { 
+      "Name": "{{user `ami_name`}}"
+    },
+    "run_volume_tags": {
+      "Name": "{{user `ami_name`}}"
+    },
+    "snapshot_tags": {
+      "Name": "{{user `ami_name`}}"
+    },
+    "ami_description": "Example AMI",
+    "associate_public_ip_address": "true",
+    "vpc_id": "{{user `vpc`}}",
+    "subnet_id": "{{user `subnet`}}"
+  }],
+  "provisioners": [
+    {
+        "type": "shell",
+        "inline": [
+            "sudo pip install ansible"
+        ]
+    }, 
+    {
+        "type": "ansible-local",
+        "playbook_file": "ansible/playbook.yaml",
+        "role_paths": [
+            "ansible/roles/common"
+        ],
+        "playbook_dir": "ansible",
+        "galaxy_file": "ansible/requirements.yaml"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "rm .ssh/authorized_keys ; sudo rm /root/.ssh/authorized_keys"
+      ]
+    }
+  ]
+}

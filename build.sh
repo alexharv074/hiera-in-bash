@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC1091,SC2154
 
 usage() {
   echo "Usage: environment={dev|test|prod} $0 [-h]"
